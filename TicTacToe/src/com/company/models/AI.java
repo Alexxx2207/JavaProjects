@@ -7,18 +7,18 @@ import com.company.Main;
 
 public class AI {
 
-    static char player = 'x', opponent = 'o';
+    static char player = 'O', opponent = 'X';
 
     private Boolean isMovesLeft(char[][] board)
     {
         for (int i = 0; i < 3; i++)
             for (int j = 0; j < 3; j++)
-                if (board[i][j] == '_')
+                if (board[i][j] == ' ')
                     return true;
         return false;
     }
 
-    static int evaluate(char[][] b)
+    private int evaluate(char[][] b)
     {
         for (int row = 0; row < 3; row++)
         {
@@ -63,7 +63,7 @@ public class AI {
         return 0;
     }
 
-    private int minimax(char[][] board, int depth, Boolean isMax)
+    private int minimax(char[][] board, int depth, boolean isMax)
     {
         int score = evaluate(board);
 
@@ -80,7 +80,7 @@ public class AI {
 
         if (isMax)
         {
-            best = -1000;
+            best = Integer.MIN_VALUE;
 
             for (int i = 0; i < 3; i++)
             {
@@ -90,8 +90,7 @@ public class AI {
                     {
                         board[i][j] = player;
 
-                        best = Math.max(best, minimax(board,
-                                depth + 1, false));
+                        best = Math.max(best, minimax(board, depth + 1, false));
 
                         board[i][j] = ' ';
                     }
@@ -101,7 +100,7 @@ public class AI {
 
         else
         {
-            best = 1000;
+            best = Integer.MAX_VALUE;
 
             for (int i = 0; i < 3; i++)
             {
@@ -111,8 +110,7 @@ public class AI {
                     {
                         board[i][j] = opponent;
 
-                        best = Math.min(best, minimax(board,
-                                depth + 1, true));
+                        best = Math.min(best, minimax(board, depth + 1, true));
 
                         board[i][j] = ' ';
                     }
@@ -124,7 +122,7 @@ public class AI {
 
     public Move findBestMove(char[][] board)
     {
-        int bestVal = -1000;
+        int bestVal = Integer.MIN_VALUE;
         Move bestMove = new Move();
         bestMove.setRow(-1);
         bestMove.setCol(-1);
