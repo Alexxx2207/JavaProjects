@@ -27,14 +27,19 @@ public class Board {
 
     public void drawBoard()
     {
+        int counter = 1;
         System.out.println("\nBoard: ");
-        System.out.println(new String("#######"));
+        System.out.println(new String("|---|---|---|"));
         for (Cell[] cells : board) {
             for (Cell cell : cells) {
-                System.out.print("#" + cell.getSymbol());
+                if(cell.getSymbol().equals(" "))
+                    System.out.print("| " + counter + " ");
+                else
+                    System.out.print("| " + cell.getSymbol() + " ");
+                counter++;
             }
-            System.out.println("#");
+            System.out.println("|");
         }
-        System.out.println(new String("#######\n"));
+        System.out.println(new String("|---|---|---|\n"));
     }
 }

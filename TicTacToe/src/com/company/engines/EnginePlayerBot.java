@@ -1,78 +1,113 @@
 package com.company.engines;
 
+import com.company.models.AI;
 import com.company.models.Board;
+import com.company.models.Move;
 
 import java.util.Scanner;
 import java.util.stream.Stream;
 
-public class Engine2Player {
+public class EnginePlayerBot {
 
     private final Scanner consoleReader;
 
     private final Board board;
 
-    // Player 1 -> играе с X
-    // Player 2 -> играе с O
+    private final String player = "X";
+    private final String enemy = "O";
+
+    // Player -> 1
+    // Bot    -> 2
     private int currentPlayer;
 
-    public Engine2Player(Scanner reader) {
+    public EnginePlayerBot(Scanner reader) {
         this.board = new Board();
         currentPlayer = -1;
         consoleReader = reader;
     }
 
-
     public void Run()
     {
-        String currentSymbol = "";
+        AI bot = new AI();
 
         for (int turn = 0; turn < 9; turn++)
         {
-            board.drawBoard();
-
-            if(turn % 2 == 0)
-            {
-                currentSymbol = "X";
-            }
-            else
-            {
-                currentSymbol = "O";
-            }
             currentPlayer = turn % 2 + 1;
 
+            board.drawBoard();
 
             if(turn == 8) {
-                fillLastCell(currentSymbol);
+                fillLastCell(player);
                 break;
             }
 
-            int[] coordinates = null;
-
-            do {
-                do {
-                    System.out.println("Player " + (currentPlayer == 1 ? "X" : "O"));
-                    System.out.print("Insert coordinates indexes[row,col]: ");
-                    coordinates = Stream.of(consoleReader.nextLine()
-                            .split(",\\s*"))
-                            .mapToInt(Integer::parseInt).toArray();
-                }while(!checkValidCoordinatesInput(coordinates[0], coordinates[1]));
-            } while (!checkACellIsFree(coordinates[0], coordinates[1]));
-
-            board.getBoard()[coordinates[0]][coordinates[1]].setSymbol(currentSymbol);
-
-            boolean gameFinished = false;
-
-            if(turn >= 4)
+            if(turn % 2 == 0)
             {
+                Move move = playerTurn(turn);
 
-                gameFinished = hasWinner(coordinates[0], coordinates[1], currentSymbol);
+                if(turn >= 4)
+                {
+                    if(checkEndGame(move.getRow(), move.getCol(), player))
+                    {
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                char[][] charBoard  = new char[3][3];
 
-                if(gameFinished) {
-                    gameEnd(currentPlayer);
-                    break;
+                for (int i = 0; i < 3; i++) {
+                    for (int j = 0; j < 3; j++) {
+                        charBoard[i][j] = board.getBoard()[i][j].getSymbol().charAt(0);
+                    }
+                }
+
+                Move move = bot.findBestMove(charBoard);
+                board.getBoard()[move.getRow()][move.getCol()].setSymbol(enemy);
+
+                if(turn >= 4)
+                {
+                    if(checkEndGame(move.getRow(), move.getCol(), enemy))
+                    {
+                        break;
+                    }
                 }
             }
         }
+    }
+
+    private boolean checkEndGame(int lastRowInserted, int lastColumnInserted, String lastSymbolInserted)
+    {
+        boolean gameFinished = false;
+
+        gameFinished = hasWinner(lastRowInserted, lastColumnInserted, lastSymbolInserted);
+
+        if(gameFinished) {
+            gameEnd(currentPlayer);
+        }
+
+        return gameFinished;
+    }
+
+    private Move playerTurn(int turn)
+    {
+        int choice = -1;
+        int[] coordinates = new int[2];
+        do {
+            do {
+                System.out.print("Insert coordinates indexes[row,col]: ");
+                choice = consoleReader.nextInt();
+                choice--;
+                coordinates[0] = choice / 3;
+                coordinates[1] = choice % 3;
+
+            }while(!checkValidCoordinatesInput(coordinates[0], coordinates[1]));
+        } while (!checkACellIsFree(coordinates[0], coordinates[1]));
+
+        board.getBoard()[coordinates[0]][coordinates[1]].setSymbol(player);
+
+        return new Move(coordinates[0], coordinates[1]);
     }
 
     private boolean hasWinner(int lastSymbolInsertedRow,
@@ -133,7 +168,7 @@ public class Engine2Player {
                 break;
             }
         }
-        
+
         return haveWinner;
     }
 
@@ -174,7 +209,7 @@ public class Engine2Player {
 
     private void fillLastCell(String currentSymbol)
     {
-        for (int row = 0; row < 3; row++) {
+        tp:for (int row = 0; row < 3; row++) {
             for (int col = 0; col < 3; col++) {
                 if(board.getBoard()[row][col].getSymbol().equals((" ")))
                 {
@@ -188,9 +223,10 @@ public class Engine2Player {
                     else {
                         gameEnd(-1);
                     }
-                    break;
+                    break tp;
                 }
             }
         }
     }
+
 }

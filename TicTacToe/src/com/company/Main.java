@@ -1,18 +1,22 @@
 package com.company;
 
 import com.company.engines.Engine2Player;
+import com.company.engines.EnginePlayerBot;
 
 import java.util.Scanner;
 
 public class Main {
 
-    public static void main(String[] args) {
+    boolean b[] = new boolean[3];
+    int cnt = 0;
+
+    public static void main(String[] args) throws ArithmeticException {
         Scanner reader = new Scanner(System.in);
 
-        Engine2Player gameEngine2Player = new Engine2Player(reader);
+        EnginePlayerBot engine = new EnginePlayerBot(reader);
 
-        gameEngine2Player.Run();
-
+        engine.Run();
     }
+
 
 }
